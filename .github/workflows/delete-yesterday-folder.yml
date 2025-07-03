@@ -46,4 +46,4 @@ jobs:
           git commit -m "删除昨日文件夹: ${{ env.YESTERDAY }}" || true
           git push origin ${{ github.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
