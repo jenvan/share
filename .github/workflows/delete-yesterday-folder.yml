@@ -1,0 +1,49 @@
+name: Delete Yesterday's Folder
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  delete-folder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # 允许推送变更
+          fetch-depth: 0
+
+      - name: Get yesterday's date
+        id: date
+        run: |
+          yesterday=$(date -d "yesterday" +%Y-%m-%d)
+          echo "YESTERDAY=$yesterday" >> $GITHUB_ENV
+          echo "昨日日期: ${{ env.YESTERDAY }}"
+          
+      - name: Delete folder
+        id: delete
+        run: |
+          folder_path="$GITHUB_WORKSPACE/${{ env.YESTERDAY }}"
+          changed=false
+          
+          if [ -d "$folder_path" ]; then
+            echo "找到文件夹: $folder_path"
+            rm -rf "$folder_path"
+            changed=true
+            echo "文件夹已删除"
+          else
+            echo "未找到文件夹: $folder_path"
+          fi
+          
+          echo "CHANGED=$changed" >> $GITHUB_ENV
+          
+      - name: Commit changes
+        if: ${{ env.CHANGED == 'true' }}
+        run: |
+          git add .
+          git commit -m "删除昨日文件夹: ${{ env.YESTERDAY }}" || true
+          git push origin ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
