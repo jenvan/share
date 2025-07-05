@@ -2,7 +2,7 @@ name: Delete Yesterday's Folder
 
 on:
   schedule:
-    - cron: '1 1 * * *'
+    - cron: '50 23 * * *'
   workflow_dispatch:
 
 jobs:
